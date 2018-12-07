@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/angular-builders",
+    "rootDir": ".",
+    "target": "es2015",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
+    "sourceMap": true,
+    "importHelpers": true,
+    "types": [],
+    "lib": ["dom", "es2018"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/test.ts", "**/*.spec.ts"]
+}

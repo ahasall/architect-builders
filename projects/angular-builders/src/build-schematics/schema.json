@@ -1,0 +1,8 @@
+{
+  "title": "Schematic Target",
+  "description": "Schematic target options for Build Facade.",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false,
+  "required": []
+}

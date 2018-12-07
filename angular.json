@@ -128,6 +128,17 @@
           }
         }
       }
+    },
+    "sandbox": {
+      "root": "projects/sandbox",
+      "sourceRoot": "projects/sandbox/src",
+      "projectType": "library",
+      "architect": {
+        "try": {
+          "builder": "./dist/angular-builders:build-schematics",
+          "options": {}
+        }
+      }
     }
   },
   "defaultProject": "architect-builders"

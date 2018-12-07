@@ -80,6 +80,14 @@
             "styles": ["src/styles.scss"],
             "scripts": [],
             "assets": ["src/favicon.ico", "src/assets"]
+          },
+          "configurations": {
+            "ci": {
+              "watch": false,
+              "progress": false,
+              "browsers": "ChromeHeadlessCI",
+              "codeCoverage": true
+            }
           }
         },
         "lint": {

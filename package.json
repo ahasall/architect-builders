@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
+    "test:ci": "ng test --configuration=ci",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "e2e:ci": "ng e2e --configuration=ci",
@@ -17,7 +18,7 @@
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "lint-staged",
-      "pre-push": "npm test"
+      "pre-push": "npm test:ci"
     }
   },
   "lint-staged": {

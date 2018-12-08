@@ -4,8 +4,7 @@ import {
   BuilderContext,
   BuildEvent
 } from '@angular-devkit/architect';
-import { getSystemPath, normalize, resolve } from '@angular-devkit/core';
-import { Path } from '@angular-devkit/core';
+import { getSystemPath, normalize, Path, resolve } from '@angular-devkit/core';
 import { Observable, of } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
 import { copyAssets } from '../utils/copy';
@@ -45,9 +44,7 @@ export class SchematicBuilder implements Builder<SchematicBuilderOptions> {
     const outDirPath = getOutDir(tsConfigFilePath) as Path;
 
     return of(true).pipe(
-      tap(() => {
-        buildTsc(tsConfigFilePath);
-      }),
+      concatMap(() => buildTsc(tsConfigFilePath)),
       concatMap(() => copyAssets(workspaceRootAbsolutePath, projectPath, outDirPath, assets)),
       map(() => ({ success: true }))
     );

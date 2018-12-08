@@ -132,11 +132,14 @@
     "sandbox": {
       "root": "projects/sandbox",
       "sourceRoot": "projects/sandbox/src",
-      "projectType": "library",
+      "projectType": "application",
       "architect": {
         "try": {
           "builder": "./dist/angular-builders:build-schematics",
-          "options": {}
+          "options": {
+            "tsConfig": "projects/sandbox/tsconfig.json",
+            "assets": ["package.json", "builders.json", "src/**/*.json"]
+          }
         }
       }
     }

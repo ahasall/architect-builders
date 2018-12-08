@@ -2,7 +2,19 @@
   "title": "Schematic Target",
   "description": "Schematic target options for Build Facade.",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "assets": {
+      "type": "array",
+      "description": "List of static assets.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "tsConfig": {
+      "type": "string"
+    }
+  },
   "additionalProperties": false,
-  "required": []
+  "required": ["tsConfig"]
 }

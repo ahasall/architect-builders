@@ -4,13 +4,23 @@ import {
   BuilderContext,
   BuildEvent
 } from '@angular-devkit/architect';
-import { resolve } from '@angular-devkit/core';
-
+import { getSystemPath, normalize, resolve } from '@angular-devkit/core';
+import { Path } from '@angular-devkit/core';
 import { Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { concatMap, map, tap } from 'rxjs/operators';
+import { copyAssets } from '../utils/copy';
+import { buildTsc } from '../utils/build';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface SchematicBuilderOptions {
-  buildTarget: string;
+  assets?: string[];
+  tsConfig: string;
+}
+
+function getOutDir(tsConfigFilePath): string {
+  const tsConfig = fs.readFileSync(tsConfigFilePath).toString('utf-8');
+  return JSON.parse(tsConfig).compilerOptions.outDir;
 }
 
 export class SchematicBuilder implements Builder<SchematicBuilderOptions> {
@@ -20,14 +30,25 @@ export class SchematicBuilder implements Builder<SchematicBuilderOptions> {
     builderConfig: BuilderConfiguration<Partial<SchematicBuilderOptions>>
   ): Observable<BuildEvent> {
     const options = builderConfig.options;
-    const root = this.context.workspace.root;
-    const projectRoot = resolve(root, builderConfig.root);
+    const workspaceRootAbsolutePath = this.context.workspace.root;
+    const projectPath = builderConfig.root;
+    const projectRoot = resolve(workspaceRootAbsolutePath, projectPath);
+    const assets = options.assets;
+    let tsConfigFilePath;
+
+    tsConfigFilePath = options.tsConfig
+      ? getSystemPath(resolve(workspaceRootAbsolutePath, normalize(options.tsConfig)))
+      : getSystemPath(
+          resolve(workspaceRootAbsolutePath, normalize(path.join(projectRoot, 'tsconfig.json')))
+        );
+
+    const outDirPath = getOutDir(tsConfigFilePath) as Path;
+
     return of(true).pipe(
       tap(() => {
-        console.log(`⚽️ I am able to run`);
-        console.log(options);
-        console.log(projectRoot);
+        buildTsc(tsConfigFilePath);
       }),
+      concatMap(() => copyAssets(workspaceRootAbsolutePath, projectPath, outDirPath, assets)),
       map(() => ({ success: true }))
     );
   }

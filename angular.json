@@ -135,7 +135,7 @@
       "projectType": "application",
       "architect": {
         "try": {
-          "builder": "./dist/angular-builders:build-schematics",
+          "builder": "./dist/angular-builders:build",
           "options": {
             "tsConfig": "projects/sandbox/tsconfig.json",
             "assets": ["package.json", "builders.json", "src/**/*.json"]

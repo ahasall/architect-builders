@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 const projectName = 'angular-builders';
-const builderName = 'build-schematics';
+const builderName = 'build';
 
 const root = path.join(__dirname, '..', 'projects', projectName);
 const sourceRoot = path.join(root, 'src');

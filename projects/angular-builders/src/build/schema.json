@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json-schema.org/schema#",
   "title": "Schematic Target",
   "description": "Schematic target options for Build Facade.",
   "type": "object",
@@ -13,6 +14,10 @@
     },
     "tsConfig": {
       "type": "string"
+    },
+    "watch": {
+      "type": "boolean",
+      "default": false
     }
   },
   "additionalProperties": false,

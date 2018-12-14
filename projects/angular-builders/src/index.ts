@@ -1,1 +1,1 @@
-export * from './build-schematics';
+export * from './build';

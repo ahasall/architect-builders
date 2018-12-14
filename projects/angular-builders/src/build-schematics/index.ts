@@ -4,12 +4,12 @@ import {
   BuilderContext,
   BuildEvent
 } from '@angular-devkit/architect';
-import { getSystemPath, normalize, Path, resolve } from '@angular-devkit/core';
+import { getSystemPath, normalize, resolve } from '@angular-devkit/core';
+import { readJsonFile } from '@angular-devkit/schematics/tools/file-system-utility';
 import { Observable, of } from 'rxjs';
-import { concatMap, map, tap } from 'rxjs/operators';
+import { concatMap, map } from 'rxjs/operators';
 import { copyAssets } from '../utils/copy';
 import { buildTsc } from '../utils/build';
-import * as fs from 'fs';
 import * as path from 'path';
 
 export interface SchematicBuilderOptions {
@@ -18,8 +18,8 @@ export interface SchematicBuilderOptions {
 }
 
 function getOutDir(tsConfigFilePath): string {
-  const tsConfig = fs.readFileSync(tsConfigFilePath).toString('utf-8');
-  return JSON.parse(tsConfig).compilerOptions.outDir;
+  const tsConfigJson = readJsonFile(tsConfigFilePath);
+  return tsConfigJson['compilerOptions'].outDir;
 }
 
 export class SchematicBuilder implements Builder<SchematicBuilderOptions> {
@@ -29,23 +29,21 @@ export class SchematicBuilder implements Builder<SchematicBuilderOptions> {
     builderConfig: BuilderConfiguration<Partial<SchematicBuilderOptions>>
   ): Observable<BuildEvent> {
     const options = builderConfig.options;
-    const workspaceRootAbsolutePath = this.context.workspace.root;
-    const projectPath = builderConfig.root;
-    const projectRoot = resolve(workspaceRootAbsolutePath, projectPath);
+    const workspaceRoot = this.context.workspace.root;
+    const projectRelativePath = builderConfig.root;
+
     const assets = options.assets;
-    let tsConfigFilePath;
+    const tsConfig = options.tsConfig
+      ? resolve(workspaceRoot, normalize(options.tsConfig))
+      : resolve(workspaceRoot, normalize(path.join(projectRelativePath, 'tsconfig.json')));
 
-    tsConfigFilePath = options.tsConfig
-      ? getSystemPath(resolve(workspaceRootAbsolutePath, normalize(options.tsConfig)))
-      : getSystemPath(
-          resolve(workspaceRootAbsolutePath, normalize(path.join(projectRoot, 'tsconfig.json')))
-        );
-
-    const outDirPath = getOutDir(tsConfigFilePath) as Path;
+    const tsConfigPath = getSystemPath(tsConfig);
+    const outDirRelativePath = getOutDir(tsConfigPath);
+    const workspacePath = getSystemPath(workspaceRoot);
 
     return of(true).pipe(
-      concatMap(() => buildTsc(tsConfigFilePath)),
-      concatMap(() => copyAssets(workspaceRootAbsolutePath, projectPath, outDirPath, assets)),
+      concatMap(() => buildTsc(tsConfigPath)),
+      concatMap(() => copyAssets(workspacePath, projectRelativePath, outDirRelativePath, assets)),
       map(() => ({ success: true }))
     );
   }

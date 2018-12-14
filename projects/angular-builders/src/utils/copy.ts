@@ -1,29 +1,23 @@
 import * as path from 'path';
-
-import { Path } from '@angular-devkit/core';
 import { from, Observable } from 'rxjs';
 import * as glob from 'glob';
 import * as fs from 'fs';
 import { concatMap, map } from 'rxjs/operators';
 
 export function copyAssets(
-  workspaceRootAbsolutePath: Path,
-  projectPath: Path,
-  destinationPath: Path,
+  workspacePath: string,
+  projectRelativePath: string,
+  destinationRelativePath: string,
   patterns: string[]
 ): Observable<void> {
-  const globs = patterns.map(pattern => path.join(projectPath, pattern));
+  const globs = patterns.map(pattern => path.join(projectRelativePath, pattern));
+  const projectAbsolutePath = path.join(workspacePath, projectRelativePath);
 
-  return getAllPathNames(globs).pipe(
-    concatMap(pathName => {
-      const filename = pathName.split(projectPath)[1];
-      const source = path.join(workspaceRootAbsolutePath, projectPath, filename);
-      const destination = path.join(
-        workspaceRootAbsolutePath,
-        projectPath,
-        destinationPath,
-        filename
-      );
+  return getAllRelativePathNames(globs).pipe(
+    map(pathName => pathName.split(projectRelativePath)[1]),
+    concatMap(fileName => {
+      const source = path.join(projectAbsolutePath, fileName);
+      const destination = path.join(projectAbsolutePath, destinationRelativePath, fileName);
       return copyFile(source, destination);
     })
   );
@@ -52,7 +46,7 @@ function ensureDirectoryExistence(filePath) {
   fs.mkdirSync(dirname);
 }
 
-function getAllPathNames(patterns: string[]): Observable<string> {
+function getAllRelativePathNames(patterns: string[]): Observable<string> {
   const patterns$ = from(patterns);
   return patterns$.pipe(
     map(pattern => getMatchingPathNames(pattern)),
